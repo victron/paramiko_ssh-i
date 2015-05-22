@@ -1,0 +1,38 @@
+---
+# simple playbook for testing
+  #- debug: var=result
+  #- debug: var=result.stdout_lines
+  #- debug: var=result.stdout.find("#")
+  
+- hosts: cisco
+  gather_facts: False
+
+  tasks:
+  - name: check "enable" mode (super user mode)
+    raw: ;empty command                                      # it's just empty comment in console
+    register: check_mode
+
+  - name: 'enable'
+    raw: enable
+    when: check_mode.stdout.find("#") == -1
+    register: result                                          # not used
+
+  - name: 'configure terminal'
+    raw: conf t
+    when: check_mode.stdout.find("#") != -1
+    register: result
+    failed_when: result.stdout.find("(config)") == -1
+    
+
+  - name: 'interface configuration fa0/1'
+    raw: int fa0/1
+    register: check_mode
+    failed_when: check_mode.stdout.find("(config-if)") == -1
+
+  - name: no shutdown
+    raw:  shutdown
+    register: result
+
+  - name: close connection
+    raw: ^~.
+    register: result

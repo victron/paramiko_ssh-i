@@ -1,0 +1,12 @@
+---
+# simple playbook for testing
+# configure R2
+
+- hosts: R2
+  gather_facts: False
+
+  tasks:
+  - include: conf_t.yml enable="password"
+  - { include: int_conf.yml, conf: {int: fa0/0, param: desc cloud connection}}
+  - { include: int_conf.yml, conf: {int: fa0/1, param: desc connect to R1}}
+  

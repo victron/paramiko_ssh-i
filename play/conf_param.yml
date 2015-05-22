@@ -1,0 +1,5 @@
+---
+
+- name: conf
+  raw: "{{ item }}"
+  with_items: conf.param

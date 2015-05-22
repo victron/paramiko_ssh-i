@@ -1,0 +1,7 @@
+---
+# generate tcl template
+
+- local_action: command date +%s
+  register: id
+  
+- local_action: template src="{{src_template}}" dest="./template.tcl_{{id.stdout_lines.0}}.tmp"

@@ -1,0 +1,23 @@
+---
+# simple playbook for testing
+  #- debug: var=result
+  #- debug: var=result.stdout_lines
+  #- debug: var=result.stdout.find("#")
+
+- hosts: R1
+  gather_facts: False
+
+  tasks:
+  - include: conf_t.yml enable="password"
+  - include: int_conf.yml int=fa0/1
+  - include: int_conf.yml int="ra fa 0/0 - 1"
+#  - include: interface_conf.yml int=fa0/1 action="ip add 192.168.3.3 255.255.255.0"
+  - include: interface_conf.yml int=fa0/1 action="desc test2"
+#  - include: interface_conf.yml int=fa0/1 action="shut"
+  - include: end_config.yml
+  
+  - include: conf_t.yml
+  - include: interface_conf.yml int=fa0/1 action="no shut"
+  
+  - include: close_connection.yml
+  

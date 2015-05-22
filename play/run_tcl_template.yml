@@ -1,0 +1,30 @@
+---
+# generate tcl template
+# upload on router from ftp 
+# execute 
+# delete file from router and localy
+# vars:
+#   src_template
+#   object for template transfered via include 
+#   first part of ftp_url
+#   destination TODO: optional
+#   
+#   
+- local_action: command date +%s
+  register: id
+- debug: msg="{{id}}"
+  
+- local_action: template src="{{src_template}}" dest="./template.tcl_{{id.stdout_lines.0}}.tmp"
+
+- include: copy.yml src_url="{{ftp_url}}/template.tcl_{{id.stdout_lines.0}}.tmp" dst_url="flash:"
+
+- name: delete local tmp template
+  local_action: command rm "./template.tcl_{{id.stdout_lines.0}}.tmp"
+  
+
+- name: run tclsh
+  raw: "tclsh flash:template.tcl_{{id.stdout_lines.0}}.tmp"
+  
+- name: delete remote tmp template
+  raw: "delete /f flash::template.tcl_{{id.stdout_lines.0}}.tmp"
+  

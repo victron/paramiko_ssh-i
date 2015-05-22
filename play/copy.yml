@@ -1,0 +1,34 @@
+---
+# copy files from ftp server
+# vars:
+#   src_url
+#   dst_url
+# -----
+# R1#copy ftp://192.168.2.1/int_conf_template.tcl flash:
+# Destination filename [int_conf_template.tcl]?
+#
+
+- include: conf_t.yml enable="password"
+
+- name: Suppress file confirmation prompts
+  raw: file prompt quiet
+  register: result
+  failed_when: result.stdout.find("%") != -1
+  
+- name: exec mode
+  raw: end
+  
+- name: copy file from server
+  raw: "copy {{src_url}} {{dst_url}}"
+  register: result
+  failed_when: result.stdout.find("%") != -1
+  
+- name: dir
+  # task need to avoid drop connection by next task
+  # TODO: replace on checksum checking
+  raw: dir
+  register: result
+  
+
+  
+

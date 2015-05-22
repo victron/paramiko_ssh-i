@@ -1,0 +1,11 @@
+---
+# enter in 'enable'
+- name: 'enable'
+  raw: enable
+  register: enable_out
+  failed_when: enable_out.stdout.find("Password") == -1
+  
+- name: "'enable' password"
+  raw: "{{enable_pass}}"
+  register: result
+  failed_when: result.stdout.find("#") == -1

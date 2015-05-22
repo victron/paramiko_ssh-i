@@ -1,0 +1,29 @@
+---
+# close connection to router
+# actually it's not obligatory to use this manipulation, because tcp connection drops when ansible exit
+#
+
+- name: simple prompt checking
+  raw: ;empty command                                      # it's just empty comment in console
+  register: check_mode
+  
+- name: exit into top
+  raw: end
+  when: check_mode.stdout.find("#(") != -1
+        or check_mode.stdout.find(">") != -1               # if '#('  or ">"in prompt don't execute
+  register: result 
+  
+- name: 'exit'
+  raw: exit                                                 # close connection by router
+  
+#- name: close connection
+  #raw: ;                                                  # as one alternative to close connection
+
+#- name: shutdown fa0/1
+  #raw: "{{item}};"
+  #register: result
+  #with_items:
+    #- conf t
+    #- int fa0/1
+    #- no shutdown
+    #-                                                      # it works like ;

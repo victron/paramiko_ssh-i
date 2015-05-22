@@ -1,0 +1,9 @@
+conf t
+{% for int in ints %}
+int {{ int.int }}
+{% for action in int.param %}
+{{ action }}
+{% endfor %}
+{% endfor %}
+exit
+

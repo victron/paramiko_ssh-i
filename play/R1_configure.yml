@@ -1,0 +1,51 @@
+---
+# simple playbook for testing
+# configure R1
+# R1 need 'enable' password (R2 not)
+
+- hosts: R1
+  gather_facts: False
+  
+  vars:
+    R1_ints:
+      - {int: fa1/1, param : ['ip addr 192.168.11.254 255.255.255.0', 'desc network sun',    'shut']}
+      - {int: fa1/2, param : ['ip addr 192.168.12.254 255.255.255.0', 'desc network mars',   'shut']}
+      - {int: fa1/3, param : ['ip addr 192.168.13.254 255.255.255.0', 'desc network moon',   'shut']}
+      - {int: fa1/4, param : ['ip addr 192.168.14.254 255.255.255.0', 'desc network saturn', 'shut']}
+      
+    int_head: ['ip address', 'description', '']
+    
+  tasks:
+# ---------- interface configuration via CLI ------------------------
+  - include: conf_t.yml enable="password"
+  - { include: int_conf.yml, conf: {int: fa0/1, param: desc connection to R2}}
+  #- { include: int_conf.yml, conf: {int: fa0/1, param: ['no shut', 'desc connection to R2']}}
+  # just another syntax
+  - include: int_conf.yml
+    vars:
+      conf:
+        int: fa0/0
+        param: 
+          - description not used
+          - shut
+# configure access networks
+# unfortunetaly with_items not applicable with include statement
+  - include: int_conf.yml conf="{{R1_ints.0}}"
+  - include: int_conf.yml conf="{{R1_ints.1}}"
+  - include: int_conf.yml conf="{{R1_ints.2}}"
+  - include: int_conf.yml conf="{{R1_ints.3}}"
+  
+  - name: exec mode
+    raw: end
+    register: result
+    failed_when: result.stdout.find("%") != -1
+    
+# configure access networks
+# same as above, but generating template and loading it via cisco tclsh
+  - include: run_tcl_template.yml
+    vars:
+      ints: "{{R1_ints}}"
+      src_template: int_conf_template.j2
+      ftp_url: "ftp://192.168.2.1/"
+
+  

@@ -1,0 +1,5 @@
+---
+# exit from config in exec mode
+- name: exit from 'config' mode
+  raw: end
+  register: result

@@ -1,0 +1,14 @@
+---
+- hosts: cisco
+  gather_facts: False
+  
+  tasks:
+  - name: shutdown fa0/1
+    raw: "{{item}};"
+    register: result
+    with_items:
+      - conf t
+      - int fa0/1
+      - no shutdown
+      - 
+      

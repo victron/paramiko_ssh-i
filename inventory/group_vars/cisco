@@ -1,0 +1,6 @@
+---
+ansible_connection: paramiko_ssh-i
+#ansible_connection: paramiko
+ansible_ssh_user: test
+ansible_ssh_pass: testtest
+

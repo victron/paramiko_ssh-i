@@ -1,0 +1,14 @@
+---
+- hosts: cisco
+  gather_facts: False
+  tasks:
+  - name: replay hostname
+    raw: show run | i hostname
+    register: foo_result
+    
+ 
+  - name: copy file
+    raw: |
+      conf t ;
+      int fa0/1 ;
+      no shut ;

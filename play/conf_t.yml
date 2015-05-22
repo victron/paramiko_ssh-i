@@ -1,0 +1,20 @@
+---
+# enter in cisco config mode
+
+- name: check "enable" mode (super user mode)
+  raw: ;empty command
+  register: check_mode
+  
+- include: enable.yml enable_pass="password"
+  when: check_mode.stdout.find("#") == -1
+
+- name: terminal no monitor
+  raw: terminal no monitor
+  register: result
+  failed_when: result.stdout.find("#") == -1
+  
+- name: 'configure terminal'
+  raw: conf t
+  #when: check_mode.stdout.find("#") != -1
+  register: check_mode
+  failed_when: check_mode.stdout.find("(config)") == -1

@@ -1,0 +1,32 @@
+---
+# configure interface
+# vars:
+#   conf:
+#      int:
+#      param:
+
+#- debug: msg="{{conf}}"
+
+  #vars:
+    #R1_ints:
+      #- {int: fa1/1, param : ['ip addr 192.168.11.254 255.255.255.0', 'desc network sun',    'shut']}
+      #- {int: fa1/2, param : ['ip addr 192.168.12.254 255.255.255.0', 'desc network mars',   'shut']}
+      #- {int: fa1/3, param : ['ip addr 192.168.13.254 255.255.255.0', 'desc network moon',   'shut']}
+      #- {int: fa1/4, param : ['ip addr 192.168.14.254 255.255.255.0', 'desc network saturn', 'shut']}
+      
+- name: "interface configuration {{conf.int}}"
+  raw: "int {{ conf.int }}"
+  register: check_mode
+  failed_when: (check_mode.stdout.find("(config-if)") == -1 and check_mode.stdout.find("(config-if-range)") == -1) 
+               or check_mode.stdout.find("%") != -1
+  
+- debug: msg="{{conf.param}}"
+- name: "interface {{ conf.int }} => {{ item }}"
+  raw: "{{ item }}"
+  with_items: conf.param
+
+
+
+
+
+  

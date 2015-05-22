@@ -1,0 +1,12 @@
+---
+# delete file
+# vars:
+#   url
+# -----
+# delete /f int_conf_template.tcl
+# 
+#
+
+- name: delete file
+  raw: delete /f {{url}}
+  failed_when: result.stdout.find("%") != -1

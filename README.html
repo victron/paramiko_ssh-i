@@ -1,0 +1,97 @@
+<h1>Ansible paramiko connection plugin with support interactive session</h1>
+
+<hr />
+
+<p>Some devices, such routers (cisco) need interactive session, in reason sub-menu hierarchy.
+It's just modification of standard paramiko pluging, to keep session active and allow walk trough menu.</p>
+
+<h4>below example how play-book could look</h4>
+
+<h2>```</h2>
+
+<p># simple playbook for testing
+  #- debug: var=result
+  #- debug: var=result.stdout_lines
+  #- debug: var=result.stdout.find("#")</p>
+
+<ul>
+<li><p>hosts: cisco
+gather_facts: False</p>
+
+<p>tasks:</p>
+
+<ul>
+<li><p>name: check "enable" mode (super user mode)
+raw: ;empty command                                      # it's just empty comment in console
+register: check_mode</p></li>
+<li><p>name: 'enable'
+raw: enable
+when: check_mode.stdout.find("#") == -1
+register: result                                          # not used</p></li>
+<li><p>name: 'configure terminal'
+raw: conf t
+when: check<em>mode.stdout.find("#") != -1
+register: result
+failed</em>when: result.stdout.find("(config)") == -1</p></li>
+<li><p>name: 'interface configuration fa0/1'
+raw: int fa0/1
+register: check<em>mode
+failed</em>when: check_mode.stdout.find("(config-if)") == -1</p></li>
+<li><p>name: no shutdown
+raw:  shutdown
+register: result</p></li>
+<li><p>name: close connection
+raw: exit
+register: result
+```</p></li>
+</ul></li>
+</ul>
+
+<h2>Test environment</h2>
+
+<p>Project directory includes ready for test environment based on GNS3 simulator inside vagrant.
+:###: Topology
+<img src="GNS3/GNS3_ans-v/topology.png" alt="alt topology" title="" />
+Everything should be ready after 
+<code>
+vagrant up
+</code>
+After connecting to virtual machine
+<code>
+vagrant ssh
+</code>
+<a href="http://tmux.sourceforge.net/">tmux</a> loaded automatically with 3 tabs.</p>
+
+<h4>In first two tabs - simulation of console connection to two routers (R1, R2)</h4>
+
+<p><code>
+telnet 127.0.0.1 2501 # or telnet 127.0.0.1 2502 call from console
+</code>
+In those tabs it's easy to control what commands successfully executed on routers
+Output example:
+<code>
+*Mar  1 00:19:47.679: %HA_EM-6-LOG: CLIaccounting: interface FastEthernet0/1
+*Mar  1 00:19:48.719: %HA_EM-6-LOG: CLIaccounting: description connection to R
+*Mar  1 00:19:49.631: %HA_EM-6-LOG: CLIaccounting: interface FastEthernet0/0
+*Mar  1 00:19:50.651: %HA_EM-6-LOG: CLIaccounting: description not use
+*Mar  1 00:19:51.563: %HA_EM-6-LOG: CLIaccounting: shutdown
+</code>
+If command is unsuccessful or wrong syntax, it missing inside output.
+To capture such errors <code>failed_when:</code> need inside playbook.</p>
+
+<h4>In third tab working directory with ansible environment</h4>
+
+<p><code>
+ # direct call
+cd /vagrant/play &amp;&amp; source ansible/hacking/env-setup
+</code></p>
+
+<h4>There are two working playbooks for configure R1 and R2 for test</h4>
+
+<p><code>
+ansible-playbook R1_configure.yml
+</code>
+and
+<code>
+ansible-playbook R2_configure.yml
+</code></p>

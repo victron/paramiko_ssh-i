@@ -1,0 +1,46 @@
+#!/usr/bin/expect
+set timeout 5
+# Logging is disabled on sdtout
+log_user 0
+set ip [lindex $argv 0]
+set port [lindex $argv 1]
+set username [lindex $argv 2]
+set password [lindex $argv 3]
+set hostname [lindex $argv 4]
+set enable "password"
+
+spawn telnet $ip $port
+
+expect "Username: " {send "$username\n"}
+expect "Password: " {send "$password\n"}
+
+expect {
+  timeout { send_user "\nFailed to get prompt\n"; exit 1 }
+  eof { send_user "\nfailure for $hostname\n"; exit 1 }
+  "$hostname>" {send "en\n"}
+  "$hostname#"
+}
+
+expect "Password: " {send "$enable\n"}
+
+send "conf t\r\n"
+expect {
+  timeout { send_user "\nfailed  conf t\n"; exit 1}
+  "*config)#"
+
+}
+
+send "crypto key generate rsa\n"
+expect {
+  timeout { send_user "\nfailed generate rsa\n"; exit 1}
+  "How many bits in the modulus \\\[512\\\]: " {send "1024\n"}
+}
+
+expect "*config)#" {send "end\n"}
+
+expect "$hostname#" { send "format flash:\n"}
+expect "*\\\[confirm\\\]" { send "\n"}
+send "exit\n"
+
+send_user "\nOK\n" 
+exit 0

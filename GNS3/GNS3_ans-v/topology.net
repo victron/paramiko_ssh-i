@@ -1,0 +1,60 @@
+autostart = True
+version = 0.8.6
+[127.0.0.1:7200]
+    workingdir = /tmp
+    udp = 10001
+    [[3725]]
+        image = /vagrant/GNS3/Images/c3725-advipservicesk9-mz.124-6.T.image
+        ram = 128
+        idlepc = 0x602ac988
+        sparsemem = True
+    [[ROUTER R1]]
+        model = 3725
+        console = 2101
+        aux = 2501
+        cnfg = configs/R1.recovered.cfg
+        f0/1 = R2 f0/1
+        slot1 = NM-16ESW
+        x = 306.0
+        y = 66.0
+        z = 1.0
+    [[ROUTER R2]]
+        model = 3725
+        console = 2102
+        aux = 2502
+        cnfg = configs/R2.recovered.cfg
+        f0/0 = nio_tap:tap1
+        f0/1 = R1 f0/1
+        x = -26.0
+        y = 66.0
+        z = 1.0
+[GNS3-DATA]
+    configs = configs
+    workdir = /tmp
+    [[NOTE 1]]
+        text = "fa1/1  192.168.11.254\nfa1/2  192.168.12.254\nfa1/3  192.168.13.254\nfa1/4  192.168.14.254"
+        x = 472.0
+        y = 51.0
+    [[NOTE 2]]
+        text = "192.168.2.2"
+        x = -61.0
+        y = 120.0
+    [[NOTE 3]]
+        text = "192.168.3.1"
+        x = 288.0
+        y = 134.0
+    [[NOTE 4]]
+        text = "tap1: 192.168.2.1"
+        x = -340.0
+        y = 131.0
+    [[Cloud C1]]
+        x = -327.5
+        y = 54.0
+        z = 1.0
+        connections = R2:f0/0:nio_tap:tap1
+    [[SHAPE 1]]
+        type = rectangle
+        x = 451.0
+        y = 2.0
+        width = 278.0
+        height = 209.0
